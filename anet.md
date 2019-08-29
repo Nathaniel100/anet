@@ -207,16 +207,25 @@ int accept(int socket, struct sockaddr *sa, socklen_t *sock_len);
 ### 2.6 发送数据
 
 `socket` 可以作为一种文件描述符，可看作文件处理，我们可以直接使用系统调用`write`发送和`read`读取数据。
+其中`send`和`write`都可以发送数据，如果`send`方法的flags为0，则与`write`相同的功能。`send`和`write`中的`socket`参数都必须是已连接的`socket`, 否则会发送数据失败.
 
 #### 2.6.1 write
 
 ```c
+/**
+ * 发送数据
+ * @param fd 已连接的socket
+ * @param buf 数据
+ * @param size 数据大小
+ * @return 发送数据的大小，如果小于0则说明发送失败
+ */
 int write(int fd, const void *buf, size_t size);
 ```
 
 #### 2.6.2 send
 
 ```c
+// flags一般传0
 int send(int socket, const void *buf, size_t size, int flags);
 ```
 
@@ -229,20 +238,32 @@ int sendmsg(int socket, const struct msghdr *message, int flags);
 #### 2.6.4 sendto
 
 ```c
+// 一般用于udp
 int sendto(int socket, const void *buf, size_t size, int flags, const struct sockaddr *sa, socklen_t sock_len);
 ```
 
 ### 2.7 接收数据
 
+其中`recv`和`read`都可以接收数据，如果`recv`方法的flags为0，则与`read`相同的功能。`recv`和`read`中的`socket`参数都必须是已连接的`socket`, 否则会接收数据失败.
+
 #### 2.7.1 read
 
 ```c
+/**
+ * 接收数据
+ *
+ * @param socket 已连接的socket
+ * @param buf 接收数据的缓存
+ * @param size 缓存大小
+ * @return 接收数据大小, 如果为0，表示对端已关闭，如果小于0说明接收数据出错
+ */
 int read(int socket, void *buf, size_t size);
 ```
 
 #### 2.7.2 recv
 
 ```c
+// flags一般传0
 int recv(int socket, void *buf, size_t size, int flags);
 ```
 
@@ -255,10 +276,31 @@ int recvmsg(int socket, struct msghdr *message, int flags);
 #### 2.7.4 recvfrom
 
 ```c
+// 一般用于udp
 int recvfrom(int socket, void *buf, size_t size, int flags,
 struct sockaddr *sa, socklen_t *sock_len);
 ```
 
+### 2.8 关闭
 
+```c
+/**
+ * 关闭socket，可根据how决定关闭发送端和接收端
+ *
+ * @param socket 已连接的socket
+ * @param how SHUT_RD表示接收端；SHUT_WR表示发送端；SHUT_RDWR表示接收端和发送端
+ * @return 0表示成功，小于0表示失败
+ */
+int shutdown(int socket, int how);
+```
 
+### 2.9 销毁
 
+```c
+/**
+ * 销毁socket，会同时关闭发送端和接收端
+ * @param fd 文件描述符
+ * @return 0表示成功，小于0表示失败
+ */
+int close(int fd);
+```
