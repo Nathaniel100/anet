@@ -43,12 +43,12 @@ struct sockaddr_in6 {
 
 ```c
 struct addrinfo {
-  int ai_flags;
-  int ai_family;
-  int ai_socktype;
-  int ai_protocol;
-  socklen_t ai_addrlen;
-  struct sockaddr *ai_addr;
+  int ai_flags; // AI_PASSIVE, AI_CANONNAME, AI_NUMERICHOST, ...
+  int ai_family; // AF_INET, AF_INET6
+  int ai_socktype; // SOCK_STREAM, SOCK_DGRAM
+  int ai_protocol; // 通常使用0，表示任意
+  socklen_t ai_addrlen; // ai_addr的字节长度
+  struct sockaddr *ai_addr; // struct sockaddr_in , struct sockaddr_in6
   char *ai_canonname;
   struct addrinfo *ai_next;
 };
