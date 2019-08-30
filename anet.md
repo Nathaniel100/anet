@@ -198,7 +198,7 @@ int listen(int socket, int listenq);
  *
  * @param socket 监听socket
  * @param sa 传出参数，对端的地址, 可以传NULL忽略
- * @param sock_len 地址类型结构的长度，可以传NULL忽略
+ * @param sock_len 地址类型结构的长度，可以传NULL忽略, 如果不为NULL，初始值必须是sizeof(sockaddr_in) 或 sizeof(sockaddr_in6)
  * @return 已连接的socket
  */
 int accept(int socket, struct sockaddr *sa, socklen_t *sock_len);
