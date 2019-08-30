@@ -6,6 +6,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_library(anet STATIC anet.cpp)
 
+add_executable(anet_main anet_main.cpp)
+target_link_libraries(anet_main anet)
+
 add_executable(resolve_main resolve_main.cpp)
 add_executable(echo_client echo_client.cpp)
 add_executable(echo_server echo_server.cpp)
