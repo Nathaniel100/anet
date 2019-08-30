@@ -304,3 +304,34 @@ int shutdown(int socket, int how);
  */
 int close(int fd);
 ```
+
+### 2.10 网络地址转换为字符串
+
+这里我们只讨论`inet_ntop`接口，该接口可同时支持`IPv4`和`IPv6`。
+
+```c
+/**
+ * 将网络地址转换为字符串
+ *
+ * @param family AF_INET表示IPv4; AF_INET6表示IPv6
+ * @param src 网络地址，如果IPv4，src应该指向sockaddr_in.sin_addr; 如果IPv6, src应该指向sockaddr_in6.sin6_addr
+ * @param dst 字符串缓存，如果IPv4，字符串大小至少为INET_ADDRSTRLEN(16); 如果IPv6，至少为INET6_ADDRSTRLEN(46)
+ * @param socklen 网络地址结构长度，如果IPv4，应该为sizeof(sockaddr_in)；如果IPv6，应该为sizeof(sockaddr_in6)
+ * @return 字符串，NULL表示转换出错
+ */
+const char *inet_ntop(int family, const void *src, char *dst, socklen_t socklen);
+```
+
+### 2.11 字符串转换为网络地址
+
+```c
+/**
+ * 将字符串转换为网络地址
+ *
+ * @param family AF_INET表示IPv4; AF_INET6表示IPv6
+ * @param src 地址字符串
+ * @param dst 网络地址，如果IPv4，dst应该指向sockaddr_in.sin_addr; 如果IPv6, dst应该指向sockaddr_in6.sin6_addr
+ * @return 大于0表示成功，等于0表示地址与family冲突，小于0表示转换出错
+ */
+int inet_pton(int family, const char *src, void *dst);
+```

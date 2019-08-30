@@ -4,7 +4,9 @@
 
 namespace anet {
 
+namespace {
 inline uint32_t Min(uint32_t a, uint32_t b) { return a < b ? a : b; }
+}  // namespace
 
 int SockAddrLen(const SockAddr *sa) {
   switch (sa->family) {
