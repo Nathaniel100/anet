@@ -335,3 +335,23 @@ const char *inet_ntop(int family, const void *src, char *dst, socklen_t socklen)
  */
 int inet_pton(int family, const char *src, void *dst);
 ```
+
+### 2.12 多路复用select
+
+```c
+
+#include <sys/select.h>
+
+void FD_ZERO(fd_set *set);
+void FD_SET(fd, fd_set *set);
+void FD_CLR(fd, fd_set *set);
+int FD_ISSET(fd, fd_set *set);
+void FD_COPY(fd_set *src, fd_set *dst);
+
+struct timeval {
+  int64_t tv_sec; // 秒
+  int32_t tv_usec; // 微秒
+};
+
+int select(int maxfdp1, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
+```
