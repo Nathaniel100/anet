@@ -14,3 +14,5 @@ add_executable(echo_client echo_client.cpp)
 add_executable(echo_server echo_server.cpp)
 
 add_executable(timeval_sizeof timeval_sizeof.cpp)
+add_executable(echo_select_client echo_select_client.cpp)
+target_link_libraries(echo_select_client anet)
