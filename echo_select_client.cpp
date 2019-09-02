@@ -4,6 +4,7 @@
 #include <sys/time.h>
 
 #include <errno.h>
+#include <stdio.h>
 
 int main() {
   anet::SockAddr server_addr;
@@ -25,31 +26,24 @@ int main() {
     printf("connect failed: %s\n", strerror(errno));
     return -1;
   }
-  fd_set rdset, wrset;
+  fd_set rdset;
   int maxfdp1 = s + 1;
-  FD_SET(s, &wrset);
-  char buffer[1024] = {0};
-  int nread = 0;
-  bool want_read = false;
-  bool want_write = true;
+  bool quit = false;
   for (;;) {
     FD_ZERO(&rdset);
-    FD_ZERO(&wrset);
-    if (want_read) {
-      FD_SET(s, &rdset);
+    FD_SET(s, &rdset);
+    if (!quit) {
+      FD_SET(0, &rdset);
     }
-    if (want_write) {
-      FD_SET(s, &wrset);
-    }
-    int result = select(maxfdp1, &rdset, &wrset, nullptr, nullptr);
+    int result = select(maxfdp1, &rdset, nullptr, nullptr, nullptr);
     if (result < 0) {
       ret = -1;
       printf("select failed: %s\n", strerror(errno));
       goto end;
     }
     if (FD_ISSET(s, &rdset)) {
-      memset(buffer, 0, sizeof(buffer));
-      nread = read(s, buffer, sizeof(buffer));
+      char buffer[1024] = {0};
+      int nread = read(s, buffer, sizeof(buffer));
       if (nread < 0) {
         ret = -1;
         printf("read failed: %s\n", strerror(errno));
@@ -58,20 +52,31 @@ int main() {
         ret = 0;
         printf("peer closed\n");
         goto end;
+      } else {
+        printf("read: %.*s\n", nread, buffer);
       }
-      printf("read: %.*s\n", nread, buffer);
-      goto end;
     }
-    if (FD_ISSET(s, &wrset)) {
-      int nwrite = write(s, "Hello World", 11);
+    if (FD_ISSET(0, &rdset)) {
+      char buffer[1024] = {0};
+      fgets(buffer, sizeof(buffer), stdin);
+      buffer[strlen(buffer) - 1] = '\0';
+      int buffer_length = strlen(buffer);
+      if (buffer_length == 0) {
+        continue;
+      }
+      if (strncmp(buffer, "quit", buffer_length) == 0) {
+        quit = true;
+        shutdown(s, SHUT_WR);
+        continue;
+      }
+      int nwrite = write(s, buffer, buffer_length);
       if (nwrite <= 0) {
+        ret = -1;
         printf("write failed: %s\n", strerror(errno));
         goto end;
       } else {
-        printf("write: Hello World\n");
+        printf("write: %.*s\n", nwrite, buffer);
       }
-      want_write = false;
-      want_read = true;
     }
   }
 
