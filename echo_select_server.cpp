@@ -20,6 +20,12 @@ int main() {
     printf("socket(AF_INET, SOCK_STREAM, 0) failed: %s\n", strerror(errno));
     return -1;
   }
+  int enable = 1;
+  if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+    printf("setsockopt(s, SOL_SOCKET, SO_REUSEADDR, enable) failed: %s\n", strerror(errno));
+    close(s);
+    return -1;
+  }
   if (bind(s, &server_addr.sa.sa, anet::SockAddrLen(&server_addr)) != 0) {
     printf("bind failed: %s\n", strerror(errno));
     close(s);
@@ -32,15 +38,15 @@ int main() {
   }
   fd_set readfds;
   FD_ZERO(&readfds);
-  int sockets[LISTENQ];
-  for (int i = 0; i < LISTENQ; i++) {
+  int sockets[FD_SETSIZE];
+  for (int i = 0; i < FD_SETSIZE; i++) {
     sockets[i] = -1;
   }
   for (;;) {
     FD_ZERO(&readfds);
     FD_SET(s, &readfds);
     int maxfdp1 = s + 1;
-    for (int i = 0; i < LISTENQ; i++) {
+    for (int i = 0; i < FD_SETSIZE; i++) {
       int client_s = sockets[i];
       if (client_s != -1) {
         FD_SET(client_s, &readfds);
@@ -69,14 +75,14 @@ int main() {
       anet::SockAddrPrint(client_addr_buffer, sizeof(client_addr_buffer),
                           &client_addr, true);
       printf("client: %s\n", client_addr_buffer);
-      for (int i = 0; i < LISTENQ; i++) {
+      for (int i = 0; i < FD_SETSIZE; i++) {
         if (sockets[i] == -1) {
           sockets[i] = connected_socket;
           break;
         }
       }
     }
-    for (int i = 0; i < LISTENQ; i++) {
+    for (int i = 0; i < FD_SETSIZE; i++) {
       int client_s = sockets[i];
       if (client_s == -1) {
         continue;
