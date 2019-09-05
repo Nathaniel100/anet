@@ -12,6 +12,7 @@ target_link_libraries(anet_main anet)
 add_executable(resolve_main resolve_main.cpp)
 add_executable(echo_client echo_client.cpp)
 add_executable(echo_server echo_server.cpp)
+add_executable(printsockopt printsockopt.cpp)
 
 add_executable(timeval_sizeof timeval_sizeof.cpp)
 add_executable(echo_select_client echo_select_client.cpp)
