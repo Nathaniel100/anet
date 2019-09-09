@@ -355,3 +355,23 @@ struct timeval {
 
 int select(int maxfdp1, fd_set *readfds, fd_set *writefds, fd_set *errorfds, struct timeval *timeout);
 ```
+
+### 2.13 fcntl
+
+```c
+#include <fcntl.h>
+
+int fcntl(int fd, int cmd, ...);
+```
+
+常见的使用为将`socket`设置为非阻塞`NON_BLOCKING`状态
+
+```c
+bool SetBlocking(int s, bool blocking) {
+  int fd_flags = fcntl(s, F_GETFL, 0); // 获取FLAG
+  if (fd_flags < 0) return false;
+  fd_flags = blocking ? (fd_flags | O_NONBLOCK) : (fd_flags & ~O_NONBLOCK);
+  fcntl(s, F_SETFL, fd_flags); // 设置FLAG
+  return true;
+}
+```
